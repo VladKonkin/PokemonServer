@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Battle.API\Battle.API.csproj" />
     <ProjectReference Include="..\PokemonServer.ApiService\PokemonServer.ApiService.csproj" />
     <ProjectReference Include="..\PokemonServer.Web\PokemonServer.Web.csproj" />
+    <ProjectReference Include="..\Register.API\Register.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

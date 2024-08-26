@@ -10,8 +10,7 @@ namespace Battle.API.Services.BattleService.Models.BattleMembers
 		{
 			_userEntity = playerEntity;
 			_pokemonList = new List<Pokemon>();
-            Console.WriteLine("Pokemons : " + _userEntity.UserPokemons.Count);
-            Console.WriteLine("Moves : " + _userEntity.UserPokemons[0].Moves.Count);
+            
             for (int i = 0; i < _userEntity.UserPokemons.Count; i++)
 			{
 				_pokemonList.Add(new Pokemon(_userEntity.UserPokemons[i]));
@@ -36,9 +35,9 @@ namespace Battle.API.Services.BattleService.Models.BattleMembers
 			Console.WriteLine("New Player Turn");
 		}
 
-		public override Guid GetId()
+		public override string GetId()
 		{
-			throw new NotImplementedException();
+			return _userEntity.TelegramId;
 		}
 
 		public override void SetTurnData(TurnData turnData)

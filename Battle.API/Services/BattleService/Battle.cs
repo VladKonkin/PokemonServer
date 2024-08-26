@@ -1,20 +1,26 @@
-﻿using Battle.API.Services.BattleService.Models.BattleMembers;
+﻿using Battle.API.Services.BattleService.Models;
+using Battle.API.Services.BattleService.Models.BattleMembers;
+using Microsoft.AspNetCore.SignalR;
 using System.Text;
 
 namespace Battle.API.Services.BattleService
 {
-	public class Battle
+	public class Battle : Hub
 	{
-		public Guid BattleId; 
-		public BattleMember _firstBattleMember;
-		public BattleMember _secondBattleMember;
+		private BattleMember _firstBattleMember;
+		private BattleMember _secondBattleMember;
 
 		private int _turnNumber;
 		private StringBuilder _battleLog;
 		private List<TurnCalculator> _turnCalculatorList;
+		private Guid _battleId;
 		public StringBuilder BattleLog => _battleLog;
 		public int TurnNumber => _turnNumber;
-		public Action BattleEndAction;
+		public Guid BattleId => _battleId;
+		public string FirstBattleMemberId => _firstBattleMember.GetId();
+		public string SecondBattleMemberId => _secondBattleMember.GetId();
+		public Action<Battle> BattleEndAction;
+		public Action<string, TurnEndData> TurnEndAction { get; set; }
 		public Battle(BattleMember first, BattleMember second)
 		{
 			_firstBattleMember = first;
@@ -25,24 +31,32 @@ namespace Battle.API.Services.BattleService
 			_battleLog = new StringBuilder("Battle Start");
 			_turnCalculatorList = new List<TurnCalculator>();
 
-			BattleId = new Guid();
+			_battleId = new Guid();
+
+			BattleMemberActionSubscribe();
+			_firstBattleMember.SetBattle(this);
+			_secondBattleMember.SetBattle(this);
+		}
+        public Battle(BattleMember first, BattleMember second,Guid battleId)
+        {
+			_firstBattleMember = first;
+			_secondBattleMember = second;
+
+			_turnNumber = 0;
+
+			_battleLog = new StringBuilder("Battle Start");
+			_turnCalculatorList = new List<TurnCalculator>();
+
+			_battleId = battleId;
 
 			BattleMemberActionSubscribe();
 			_firstBattleMember.SetBattle(this);
 			_secondBattleMember.SetBattle(this);
 		}
 
-		public TurnCalculator TryGetTurnByIndex(int turnNumber)
+        public TurnCalculator GetLastTurn()
 		{
-			Console.WriteLine("test3 : " +_turnNumber  + " " + turnNumber);
-                Console.WriteLine(_turnCalculatorList.Count + " - test3.01 Count");
-			if (turnNumber >= 0 & turnNumber <= _turnNumber)
-			{
-                Console.WriteLine(_turnCalculatorList.Count + " - test3.1 Count");
-                return _turnCalculatorList[turnNumber];
-			}
-			Console.WriteLine("test4");
-			return null;
+			return _turnCalculatorList.Last();
 		}
 
 		private void BattleMemberActionSubscribe()
@@ -67,12 +81,12 @@ namespace Battle.API.Services.BattleService
 			TurnCalculator turnCalculator = new TurnCalculator(_firstBattleMember.ActiveTurnModel, _secondBattleMember.ActiveTurnModel, _turnNumber);
 			turnCalculator.Calculate();
 
-			string log = turnCalculator.GetTurnLog();
+			string log = turnCalculator.TurnLog;
 			Console.WriteLine(log);
 			_battleLog.AppendLine(log);
 
 			_turnCalculatorList.Add(turnCalculator);
-
+			TurnEndAction?.Invoke(BattleId.ToString(),turnCalculator.TurnEndData);
 			if (_firstBattleMember.CanСontinueBattle() & _secondBattleMember.CanСontinueBattle())
 			{
 				_firstBattleMember.NexTurnStart();
@@ -90,7 +104,7 @@ namespace Battle.API.Services.BattleService
 		{
 			BattleMemberActionUnsubscribe();
 			_battleLog.AppendLine("Battle End");
-			BattleEndAction?.Invoke();
+			BattleEndAction?.Invoke(this);
 			Console.WriteLine(_battleLog);
 		}
 	}

@@ -39,9 +39,9 @@ namespace Battle.API.Services.BattleService.Models.BattleMembers
 			BattleTurnSetAction?.Invoke();
 		}
 
-		public override Guid GetId()
+		public override string GetId()
 		{
-			return Guid.Empty;
+			return "WildId";
 		}
 
 	}

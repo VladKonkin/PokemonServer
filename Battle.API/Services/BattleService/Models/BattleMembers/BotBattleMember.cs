@@ -9,9 +9,9 @@ namespace Battle.API.Services.BattleService.Models.BattleMembers
 			_pokemonList = pokemonModelList;
 		}
 
-		public override Guid GetId()
+		public override string GetId()
 		{
-			return Guid.Empty;
+			return "BotId";
 		}
 
 		public override void NexTurnStart()

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
+
 namespace Battle.API.Controllers
 {
 	[ApiController]
@@ -13,20 +14,17 @@ namespace Battle.API.Controllers
 	{
 		private UserContext _userContext;
 		private BattleHandler _battleHandler;
-        public BattleController(UserContext userContext,BattleHandler battleHandler)
+		private UserRegisterContext _userRegisterContext;
+		
+
+		public BattleController(UserContext userContext,BattleHandler battleHandler, UserRegisterContext userRegisterContext)
         {
 			_userContext = userContext;
 			_battleHandler = battleHandler;
-        }
-        [HttpGet(Name = "GetAllUsers")]
-		public async Task<IActionResult> Index()
-		{
-			return Ok(await _userContext.UserDbSet.
-				Include(u => u.UserPokemons)
-				.ThenInclude(up => up.Moves)
-				.AsSplitQuery()
-				.ToListAsync());
+			_userRegisterContext = userRegisterContext;
+
 		}
+        
 		[HttpPost(Name = "CreateBattle")]
 		public async Task<IActionResult> CreateBattle(string telegramId)
 		{
@@ -45,20 +43,50 @@ namespace Battle.API.Controllers
 			return Ok(user);
 		}
 
-		[HttpPatch(Name = ("SetMoveIndex"))]
-		public async Task<IActionResult> SetMoveIndex(string telegramId,int moveIndex)
+		//[HttpPatch(Name = ("SetMoveIndex"))]
+		//public async Task<IActionResult> SetMoveIndex(string telegramId,int moveIndex)
+		//{
+  //          Console.WriteLine("IndexTest");
+  //          var turnCalculator = _battleHandler.SetMoveIndexByTelegramId(telegramId, moveIndex);
+  //          Console.WriteLine("IndexTest1");
+
+		//	var jsonTurnEndData = JsonConvert.SerializeObject(turnCalculator.TurnEndData, Formatting.Indented);
+
+  //          return Ok(jsonTurnEndData);
+		//}
+		[HttpGet(Name =("GetRegisterData"))]
+		public async Task<IActionResult> GetRegisterData(string telegramId)
 		{
-			var turnCalculator = _battleHandler.SetMoveIndexByTelegramId(telegramId, moveIndex);
+			var user = await _userRegisterContext.UserRegisterDbSet.FirstOrDefaultAsync(u => u.TelegramId == telegramId);
+            Console.WriteLine(user);
+            if (user is null)
+			{
+				return NoContent();
+			}
 
-			var jsonTurnEndData = JsonConvert.SerializeObject(turnCalculator.GetTurnEndData(), Formatting.Indented);
-
-            Console.WriteLine("Pre json: " + turnCalculator);
-            Console.WriteLine("Json serialized: " + jsonTurnEndData );
-            Console.WriteLine("Json serialize: " + JsonConvert.SerializeObject(turnCalculator, Formatting.Indented));
-            
-
-            return Ok(jsonTurnEndData);
+			return Ok(user);
 		}
+		[HttpDelete(Name = "TestBattleCreate")]
+		public async Task<IActionResult> TestBattleCreate(string firstPlayerId, string secondPlayerId)
+		{
+			var firstPlayer = await _userContext.UserDbSet
+				.Include(u => u.UserPokemons)
+				.ThenInclude(up => up.Moves)
+				.AsSplitQuery()
+				.FirstOrDefaultAsync(u => u.TelegramId == firstPlayerId);
+			var secondPlayer = await _userContext.UserDbSet
+				.Include(u => u.UserPokemons)
+				.ThenInclude(up => up.Moves)
+				.AsSplitQuery()
+				.FirstOrDefaultAsync(u => u.TelegramId == secondPlayerId);
 
+			if (firstPlayer is null || secondPlayer is null)
+			{
+				return NoContent();
+			}
+
+			_battleHandler.CreateBattle(firstPlayer,secondPlayer);
+			return Ok(NoContent());
+		}
 	}
 }

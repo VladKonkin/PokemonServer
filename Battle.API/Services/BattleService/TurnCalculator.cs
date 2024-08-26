@@ -10,18 +10,20 @@ namespace Battle.API.Services.BattleService
 
 		bool firstAttackFirst;
 		int _turnNumber;
-		private StringBuilder turnLog;
+		private StringBuilder _turnLog;
 		private TurnEndData _endData;
+
+		public TurnEndData TurnEndData => _endData;
+		public string TurnLog => _turnLog.ToString();
 		public TurnCalculator(TurnData firstMember, TurnData secondMember, int turnNumber)
 		{
 			_firstMemberData = firstMember;
 			_secondMemberData = secondMember;
 			_turnNumber = turnNumber;
 
-			turnLog = new StringBuilder();
+			_turnLog = new StringBuilder();
 
 			_endData = new TurnEndData();
-			_endData.SetStartData(_firstMemberData, _secondMemberData);
 		}
 		public void Calculate()
 		{
@@ -29,21 +31,14 @@ namespace Battle.API.Services.BattleService
 			StartTurn();
 			TurnEnd();
 		}
-		public string GetTurnLog()
-		{
-			return turnLog.ToString();
-		}
-		public TurnEndData GetTurnEndData()
-		{
-			return _endData;
-		}
+	
 		private void CalculateSpeed()
 		{
 			firstAttackFirst = _firstMemberData.Pokemon.Speed >= _secondMemberData.Pokemon.Speed;
 		}
 		private void StartTurn()
 		{
-			turnLog.AppendLine($"Turn {_turnNumber} Start");
+			_turnLog.AppendLine($"Turn {_turnNumber} Start");
 			if (firstAttackFirst)
 			{
 				Attack(_firstMemberData, _secondMemberData);
@@ -65,12 +60,13 @@ namespace Battle.API.Services.BattleService
 		private void Attack(TurnData attacker, TurnData target)
 		{
 			target.Pokemon.TakeAttack(attacker.Pokemon, attacker.Move);
-			turnLog.AppendLine($"{attacker.Pokemon.Name} Attack {target.Pokemon.Name} With {attacker.Move.Name} and deal {attacker.Move.Power} damage");
+			_turnLog.AppendLine($"{attacker.Pokemon.Name} Attack {target.Pokemon.Name} With {attacker.Move.Name} and deal {attacker.Move.Power} damage");
 		}
 		private void TurnEnd()
 		{
-			turnLog.AppendLine($"Turn {_turnNumber} Ended");
-			_endData.SetEndData(_firstMemberData.Pokemon, _secondMemberData.Pokemon, turnLog.ToString());
+			Console.WriteLine("TurnEnd Calculator");
+			_turnLog.AppendLine($"Turn {_turnNumber} Ended");
+			_endData.SetEndData(_firstMemberData.Pokemon, _secondMemberData.Pokemon, _turnLog.ToString());
 		}
 
 	}

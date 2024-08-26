@@ -40,7 +40,7 @@ namespace Battle.API.Services.BattleService.Models.BattleMembers
             _activeTurnData = null;
         }
         public abstract void SetTurnData(TurnData turnData);
-        public abstract Guid GetId();
+        public abstract string GetId();
 
     }
 }

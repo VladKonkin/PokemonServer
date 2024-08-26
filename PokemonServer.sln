@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PokemonServer.Web", "Pokemo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Battle.API", "Battle.API\Battle.API.csproj", "{3AAA2F9E-2001-4E32-876F-F3EAC1CA7228}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Register.API", "Register.API\Register.API.csproj", "{917AC1BB-6FA5-4FE5-B940-769A7F0F024B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{3AAA2F9E-2001-4E32-876F-F3EAC1CA7228}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AAA2F9E-2001-4E32-876F-F3EAC1CA7228}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AAA2F9E-2001-4E32-876F-F3EAC1CA7228}.Release|Any CPU.Build.0 = Release|Any CPU
+		{917AC1BB-6FA5-4FE5-B940-769A7F0F024B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{917AC1BB-6FA5-4FE5-B940-769A7F0F024B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{917AC1BB-6FA5-4FE5-B940-769A7F0F024B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{917AC1BB-6FA5-4FE5-B940-769A7F0F024B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

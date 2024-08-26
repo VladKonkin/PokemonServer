@@ -8,7 +8,6 @@ namespace Battle.API.Infrastucture
 	{
         public UserContext(DbContextOptions<UserContext> options, IConfiguration configuration) : base(options)
         {
-			Database.EnsureDeleted();
 			Database.EnsureCreated();
         }
         public DbSet<UserEntity> UserDbSet { get; set; }

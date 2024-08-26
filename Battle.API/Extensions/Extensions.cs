@@ -1,4 +1,5 @@
 ﻿using Battle.API.Infrastucture;
+using Battle.API.Infrastucture.Repositories;
 using Battle.API.Services.BattleService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -10,11 +11,27 @@ namespace Battle.API.Extensions
 	{
 		public static void AddApplicationServices(this IHostApplicationBuilder builder)
 		{
-			builder.AddNpgsqlDbContext<UserContext>("UserDb", configureDbContextOptions: dbContextOptionsBuilder =>
+			//builder.AddNpgsqlDbContext<UserContext>("UserDb", configureDbContextOptions: dbContextOptionsBuilder =>
+			//{
+			//	dbContextOptionsBuilder.UseNpgsql(builder =>
+			//	{
+
+			//	});
+			//});
+			builder.Services.AddDbContext<UserContext>(options =>
+			{
+				options.UseNpgsql(builder.Configuration.GetConnectionString("UserDb"),
+					npgsqlOptions =>
+					{
+						// Здесь можно добавить дополнительные настройки Npgsql, если необходимо
+					});
+			});
+
+			builder.AddNpgsqlDbContext<UserRegisterContext>("UserRegisterDb", configureDbContextOptions: dbContextOptionsBuilder =>
 			{
 				dbContextOptionsBuilder.UseNpgsql(builder =>
 				{
-					
+
 				});
 			});
 
@@ -23,7 +40,25 @@ namespace Battle.API.Extensions
 					{
 						options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
 					});
-			builder.Services.AddSingleton(new BattleHandler());
+			builder.Services.AddSingleton<BattleHandler>();
+
+			//builder.Services.AddCors);
+
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("CorsPolicy", builder =>
+				{
+					builder
+						.AllowAnyOrigin()   // Разрешаем любые источники
+						.AllowAnyMethod()
+						.AllowAnyHeader();
+					// Учетные данные отключены
+				});
+			});
+			builder.Services.AddScoped<UserRepository>();
+			builder.Services.AddSignalR();
+
+
 		}
 	}
 }
